@@ -297,8 +297,8 @@ public class MineManager extends GameObject {
     // [Server]
     public ArrayList<OperationResult> server_getOperationResult(Player player, Operation op) {
         ArrayList<OperationResult> res = new ArrayList<>();
-        if (!this.mines[op.x][op.y].isRevealed()) {
-            if (op.type == Operation.OperationType.Normal) {
+        if (op.type == Operation.OperationType.Normal) {
+            if (!this.mines[op.x][op.y].isRevealed()) {
                 if (this.mines[op.x][op.y].isMine()) {
                     if (!this.mines[op.x][op.y].hasFlag())
                         res.add(new OperationResult(new AnimationData(op.x, op.y, 0, "reveal"), new ScoreData(player.getPlayerID(), -1, 0, 1)));
@@ -326,33 +326,37 @@ public class MineManager extends GameObject {
                         }
                     }
                 }
-            } else if (op.type == Operation.OperationType.Mark) {
+            }
+        } else if (op.type == Operation.OperationType.Mark) {
+            if (!this.mines[op.x][op.y].isRevealed()) {
                 if (this.mines[op.x][op.y].isMine()) {
                     if (!this.mines[op.x][op.y].hasFlag())
                         res.add(new OperationResult(new AnimationData(op.x, op.y, 0, "mark"), new ScoreData(player.getPlayerID(), +1, 0, 1)));
                 } else {
                     res.add(new OperationResult(new AnimationData(op.x, op.y, 0, "mark"), new ScoreData(player.getPlayerID(), 0, +1, 1)));
                 }
-            } else if (op.type == Operation.OperationType.GodPick) {
-                if (!this.mines[op.x][op.y].isRevealed() && !this.mines[op.x][op.y].hasFlag()) {
+            }
+        } else if (op.type == Operation.OperationType.GodPick) {
+            if (!this.mines[op.x][op.y].isRevealed()) {
+                if (!this.mines[op.x][op.y].hasFlag()) {
                     if (this.mines[op.x][op.y].isMine()) {
                         res.add(new OperationResult(new AnimationData(op.x, op.y, 0, "mark"), new ScoreData(player.getPlayerID(), +1, 0, Skill.GodPick.cost)));
                     } else {
                         res.add(new OperationResult(new AnimationData(op.x, op.y, 0, "reveal"), new ScoreData(player.getPlayerID(), 0, 0, Skill.GodPick.cost)));
                     }
                 }
-            } else if (op.type == Operation.OperationType.Rude) {
-                int[] dx = {-1, -1, -1, 0, 0, 0, +1, +1, +1};
-                int[] dy = {-1, 0, +1, -1, 0, +1, -1, 0, +1};
-                int cost = Skill.Rude.cost;
-                for (int k = 0; k < 9; ++k) {
-                    int nx = op.x + dx[k];
-                    int ny = op.y + dy[k];
-                    if (0 <= nx && nx < this.gridWidth && 0 <= ny && ny < this.gridHeight) {
-                        res.add(new OperationResult(new AnimationData(nx, ny, 0, "reveal"),
-                                new ScoreData(player.getPlayerID(), this.mines[nx][ny].isMine() ? -1 : 0, 0, cost)));
-                        cost = 0;
-                    }
+            }
+        } else if (op.type == Operation.OperationType.Rude) {
+            int[] dx = {-1, -1, -1, 0, 0, 0, +1, +1, +1};
+            int[] dy = {-1, 0, +1, -1, 0, +1, -1, 0, +1};
+            int cost = Skill.Rude.cost;
+            for (int k = 0; k < 9; ++k) {
+                int nx = op.x + dx[k];
+                int ny = op.y + dy[k];
+                if (0 <= nx && nx < this.gridWidth && 0 <= ny && ny < this.gridHeight && !this.mines[nx][ny].isRevealed() && !this.mines[nx][ny].hasFlag()) {
+                    res.add(new OperationResult(new AnimationData(nx, ny, 0, "reveal"),
+                            new ScoreData(player.getPlayerID(), this.mines[nx][ny].isMine() ? -1 : 0, 0, cost)));
+                    cost = 0;
                 }
             }
         }
