@@ -169,7 +169,7 @@ public class ResourceManager {
         addSoundList(soundList, "explode", "audio/explode.mp3");
         addSoundList(soundList, "error", "audio/error.mp3");
         addSoundList(soundList, "wood", "audio/wood.mp3");
-        addSoundList(soundList, "bgm", "audio/bgm_moving_on.mp3");
+        addSoundList(soundList, "bgm", "audio/bgm.mp3");
 
         Thread loadingThread = new Thread(new LoadingThread());
         loadingThread.start();
